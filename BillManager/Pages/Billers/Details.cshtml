@@ -1,0 +1,35 @@
+@page
+@model BillManager.Pages.Billers.DetailsModel
+
+<h1>@Model.Biller.Name Details</h1>
+
+<div>
+    <h3>@Model.Biller.Name</h3>
+    <p><strong>Contact Info:</strong> @Model.Biller.ContactInfo</p>
+    <p><strong>Payment Methods:</strong> @Model.Biller.PaymentMethods</p>
+</div>
+
+<h3>Bills Associated with this Biller</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Bill Name</th>
+            <th>Amount</th>
+            <th>Due Date</th>
+            <th>Recurrence</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var bill in Model.Bills)
+    {
+        <tr>
+            <td>@bill.Name</td>
+            <td>@bill.Amount</td>
+            <td>@bill.DueDate.ToString("yyyy-MM-dd")</td>
+            <td>@bill.RecurrenceType</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-page="Index">Back to List</a>

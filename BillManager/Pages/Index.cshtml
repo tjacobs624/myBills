@@ -1,0 +1,35 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Welcome to BillManager</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Billers</h5>
+                    <p class="card-text">Manage the companies or people you pay bills to.</p>
+                    <a href="/Billers" class="btn btn-primary">Manage Billers</a>
+                    <a href="/Billers/Create" class="btn btn-primary text-white">Add Biller</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-sucess shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Add New Bill</h5>
+                    <p class="card-text">Quickly add a new upcoming or recurring bill.</p>
+                    <a href="/Bills/" class="btn btn-success text-white">View Bills</a>
+                    <a href="/Bills/Create" class="btn btn-success text-white">Create Bill</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

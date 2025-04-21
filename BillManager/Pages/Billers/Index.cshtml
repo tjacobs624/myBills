@@ -1,0 +1,42 @@
+@page
+@model BillManager.Pages.Billers.IndexModel
+
+@{
+    ViewData["Title"] = "Billers";
+}
+
+<h2>Billers</h2>
+
+<p>
+    <a class="btn btn-primary" asp-page="Create">Add New Biller</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Contact Info</th>
+            <th>Payment Methods</th>
+            <th>Total Due</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Biller)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.ContactInfo</td>
+                <td>@item.PaymentMethods</td>
+                <td>
+                    @String.Format("{0:C}", item.Bills?.Sum(b => b.Amount) ?? 0)
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-sm btn-outline-secondary" asp-page="./Details" asp-route-id="@item.Id">Details</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

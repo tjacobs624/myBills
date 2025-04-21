@@ -1,0 +1,49 @@
+@page
+@model BillManager.Pages.Bills.IndexModel
+@using BillManager.Models
+
+<div class="container mt-4">
+    <h2 class="mb-4">Bills</h2>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>
+                    <a asp-page="./Index" asp-route-sortOrder="billerName">Biller</a>
+                <th>Amount</th>
+                <th>
+                    <a asp-page="./Index" asp-route-sortOrder="dueDate">Due Date</a>
+                </th>
+                <th>Paid</th>
+                <th>
+                    <a asp-page="./Index" asp-route-sortOrder="RecurrenceType">Recurrence</a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in Model.Bills)
+            {
+                <tr>
+                    <td>@bill.Name</td>
+                    <td>@(bill.Biller != null ? bill.Biller.Name : "No Biller")</td>
+                    <td>@bill.Amount.ToString("C")</td>
+                    <td>@bill.DueDate.ToShortDateString()</td>
+                    <td>
+                        <span class="badge @(bill.IsPaid ? "bg-success" : "bg-warning text-dark")">
+                            @(bill.IsPaid ? "Yes" : "No")
+                        </span>
+                    </td>
+                    <td>@(bill.RecurrenceType != BillManager.Models.RecurrenceType.None ? "Recurring" : "None")</td>
+                    <td>
+                        <a asp-page="/Bills/Edit" asp-route-id="@bill.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-page="/Bills/Delete" asp-route-id="@bill.Id" class="btn btn-sm btn-outline-danger ms-1">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="/Bills/Create" class="btn btn-success">+ Add New Bill</a>
+</div>
