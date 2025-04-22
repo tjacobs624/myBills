@@ -3,7 +3,7 @@
 
 <h2>Edit Bill</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data" asp-page-handler="Update">
     <div class="form-group">
         <label for="Name">Bill Name</label>
         <input type="text" class="form-control" id="Name" name="Input.Name" value="@Model.Input.Name" required />
@@ -11,13 +11,32 @@
 
     <div class="form-group">
         <label for="Amount">Amount</label>
-        <input type="number" class="form-control" id="Amount" name="Input.Amount" min="0.01" value="@Model.Input.Amount" required />
+        <input type="number" class="form-control" id="Amount" name="Input.Amount" step="any" value="@Model.Input.Amount" required />
     </div>
 
     <div class="form-group">
         <label for="DueDate">Due Date</label>
         <input type="date" class="form-control" id="DueDate" name="Input.DueDate" value="@Model.Input.DueDate.ToString("yyyy-MM-dd")" required />
     </div>
+
+<div class="form-group">
+    <label for="File">Attachment</label>
+    @if (!string.IsNullOrEmpty(Model.Input?.FilePath))
+    {
+        <p>Current File: <a href="@Url.Content($"~/uploads/{System.IO.Path.GetFileName(Model.Input.FilePath)}")" target="_blank">
+            @System.IO.Path.GetFileName(Model.Input.FilePath)</a></p>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="RemoveFile" name="Input.RemoveFile" />
+            <label class="form-check-label" for="RemoveFile">Remove current file</label>
+        </div>
+    }
+    else
+    {
+        <p>No file attached.</p>
+    }
+    <input type="file" class="form-control" id="File" name="File" />
+</div>
+
     <div class="form-group">
         <label for="IsPaid">Paid</label>
         <input type="checkbox" id="IsPaid" name="Input.IsPaid" @(Model.Input.IsPaid ? "checked" : "") />

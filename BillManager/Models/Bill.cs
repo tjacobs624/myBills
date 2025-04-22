@@ -16,6 +16,7 @@ namespace BillManager.Models
         public bool IsPaid { get; set; }
         public string Category { get; set; } // Optional category for the bill
         public DateTime? StopDate { get; set; } // Nullable stop date
+        public string? FilePath { get; set; } // Path to the uploaded file
 
         // Recurrence properties
         public RecurrenceType RecurrenceType { get; set; } // e.g., "Monthly", "Yearly"

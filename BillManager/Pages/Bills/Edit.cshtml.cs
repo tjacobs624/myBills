@@ -5,6 +5,9 @@ using BillManager.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BillManager.Pages.Bills
 {
@@ -27,24 +30,24 @@ namespace BillManager.Pages.Bills
         {
             var bill = _context.Bills.FirstOrDefault(b => b.Id == id);
             if (bill == null)
+            {
                 return NotFound();
+            }
 
-            Id = bill.Id;
             Input = new BillInput
             {
                 Name = bill.Name,
                 Amount = bill.Amount,
                 DueDate = bill.DueDate,
                 IsPaid = bill.IsPaid,
+                Category = bill.Category,
                 RecurrenceType = bill.RecurrenceType,
-                Category = bill.Category, // Add this if Category is part of your Bill model
-                RecurrenceInterval = bill.RecurrenceInterval, // Add this if RecurrenceInterval is part of your Bill model
                 StopDate = bill.StopDate,
-                BillerId = bill.BillerId
+                BillerId = bill.BillerId,
+                FilePath = bill.FilePath // Ensure FilePath is populated
             };
 
-            // Populate Billers list
-            LoadBillers();
+            LoadBillers(); // Populate the Billers dropdown
             return Page();
         }
 
@@ -76,6 +79,110 @@ namespace BillManager.Pages.Bills
             return RedirectToPage("./Index");
         }
 
+        public async Task<IActionResult> OnPostAsync(IFormFile File)
+        {
+            if (!ModelState.IsValid)
+            {
+                LoadBillers(); // Repopulate Billers list in case of validation failure
+                return Page();
+            }
+
+            var bill = await _context.Bills.FindAsync(Input.Id);
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            // Handle file removal
+            if (Input.RemoveFile && !string.IsNullOrEmpty(bill.FilePath) && System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", bill.FilePath.TrimStart('/'))))
+            {
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", bill.FilePath.TrimStart('/'));
+                System.IO.File.Delete(fullPath);
+                bill.FilePath = null;
+            }
+
+            // Handle file upload
+            if (File != null)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                Directory.CreateDirectory(uploadsFolder); // Ensure the folder exists
+                var filePath = Path.Combine(uploadsFolder, File.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await File.CopyToAsync(stream);
+                }
+
+                bill.FilePath = $"/uploads/{File.FileName}";
+            }
+
+            // Update other fields
+            bill.Name = Input.Name;
+            bill.Amount = Input.Amount;
+            bill.DueDate = Input.DueDate;
+            bill.IsPaid = Input.IsPaid;
+            bill.Category = Input.Category;
+            bill.RecurrenceType = Input.RecurrenceType;
+            bill.StopDate = Input.StopDate;
+            bill.BillerId = Input.BillerId;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Index");
+        }
+
+        public async Task<IActionResult> OnPostUpdateAsync(IFormFile File)
+        {
+            if (!ModelState.IsValid)
+            {
+                LoadBillers(); // Repopulate Billers list in case of validation failure
+                return Page();
+            }
+
+            var bill = await _context.Bills.FindAsync(Input.Id);
+            if (bill == null)
+            {
+                return NotFound();
+            }
+
+            // Handle file removal
+            if (Input.RemoveFile && !string.IsNullOrEmpty(bill.FilePath) && System.IO.File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", bill.FilePath.TrimStart('/'))))
+            {
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", bill.FilePath.TrimStart('/'));
+                System.IO.File.Delete(fullPath);
+                bill.FilePath = null;
+            }
+
+            // Handle file upload
+            if (File != null)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                Directory.CreateDirectory(uploadsFolder); // Ensure the folder exists
+                var filePath = Path.Combine(uploadsFolder, File.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await File.CopyToAsync(stream);
+                }
+
+                bill.FilePath = $"/uploads/{File.FileName}";
+            }
+
+            // Update other fields
+            bill.Name = Input.Name;
+            bill.Amount = Input.Amount;
+            bill.DueDate = Input.DueDate;
+            bill.IsPaid = Input.IsPaid;
+            bill.Category = Input.Category;
+            bill.RecurrenceType = Input.RecurrenceType;
+            bill.StopDate = Input.StopDate;
+            bill.BillerId = Input.BillerId;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Index");
+        }
+
         private void LoadBillers()
         {
             Billers = _context.Billers
@@ -91,30 +198,19 @@ namespace BillManager.Pages.Bills
 
         public class BillInput
         {
-            [Required]
+            public int Id { get; set; } // Added Id property
+
             public string Name { get; set; }
-
-            [Required]
-            [Range(0.01, 10000)]
             public decimal Amount { get; set; }
-
-            [Required]
-            [DataType(DataType.Date)]
             public DateTime DueDate { get; set; }
-
             public bool IsPaid { get; set; }
-
-            [Required]
+            public string Category { get; set; }
+            public int RecurrenceInterval { get; set; } // Added RecurrenceInterval property
             public RecurrenceType RecurrenceType { get; set; }
-
-            public string? Category { get; set; }
-            public int? RecurrenceInterval { get; set; }
-
-            [DataType(DataType.Date)]
             public DateTime? StopDate { get; set; }
-
-            [Required]
             public int BillerId { get; set; }
+            public string FilePath { get; set; } // Ensure this property exists
+            public bool RemoveFile { get; set; } // For file removal
         }
     }
 }

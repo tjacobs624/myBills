@@ -1,19 +1,24 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BillManager.Data;
 using BillManager.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BillManager.Pages.Bills
 {
     public class CreateModel : PageModel
     {
         private readonly BillContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public CreateModel(BillContext context)
+        public CreateModel(BillContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         [BindProperty]
@@ -30,7 +35,7 @@ namespace BillManager.Pages.Bills
         }
 
         // OnPost method to handle form submission
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
@@ -53,16 +58,34 @@ namespace BillManager.Pages.Bills
                 BillerId = Input.BillerId // Set the selected biller
             };
 
+            string? filePath = null;
+
+            if (Input.File != null)
+            {
+                // Save the file to the "uploads" folder
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder); // Ensure the folder exists
+                filePath = Path.Combine(uploadsFolder, Input.File.FileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Input.File.CopyToAsync(fileStream);
+                }
+
+                // Save the file path to the database
+                bill.FilePath = filePath;
+            }
+
             // Add the initial bill to the database
             _context.Bills.Add(bill);
-            
+
             // Generate recurring bills if needed
             if (bill.StopDate.HasValue)
             {
                 GenerateRecurringBills(bill);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Redirect to the Bills Index page after successful creation
             return RedirectToPage("./Index");
@@ -136,16 +159,18 @@ namespace BillManager.Pages.Bills
             public bool IsPaid { get; set; }
 
             [Required]
-            public RecurrenceType RecurrenceType { get; set; } // Weekly, Biweekly, Monthly
-            
+            public RecurrenceType RecurrenceType { get; set; }
+
             public string? Category { get; set; }
-            public int? RecurrenceInterval { get; set; } // For weekly, biweekly, or monthly intervals (if needed)
-            
+            public int? RecurrenceInterval { get; set; }
+
             [DataType(DataType.Date)]
-            public DateTime? StopDate { get; set; } // Nullable stop date
+            public DateTime? StopDate { get; set; }
 
             [Required]
-            public int BillerId { get; set; } // Foreign key for the Biller
+            public int BillerId { get; set; }
+
+            public IFormFile? File { get; set; } // File input
         }
     }
 }

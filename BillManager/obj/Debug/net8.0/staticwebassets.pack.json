@@ -245,6 +245,10 @@
       "PackagePath": "staticwebassets/lib/jquery/dist/jquery.min.map"
     },
     {
+      "Id": "/Users/timothyjacobs/Git/bills/BillManager/wwwroot/uploads/Oaks SST.PDF",
+      "PackagePath": "staticwebassets/uploads/Oaks SST.PDF"
+    },
+    {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BillManager.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

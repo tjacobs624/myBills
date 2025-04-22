@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "VwzbrCT2sP0vhVBPiUDOUGg31aqEwR4F6hI9dIMf0dU=",
+  "Hash": "nWDFopgIEMXesXf9GfvmoQg7VXA2VFuZakWfaX0fEbY=",
   "Source": "BillManager",
   "BasePath": "_content/BillManager",
   "Mode": "Default",
@@ -1193,6 +1193,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/lib/jquery/LICENSE.txt"
+    },
+    {
+      "Identity": "/Users/timothyjacobs/Git/bills/BillManager/wwwroot/uploads/Oaks SST.PDF",
+      "SourceId": "BillManager",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/timothyjacobs/Git/bills/BillManager/wwwroot/",
+      "BasePath": "_content/BillManager",
+      "RelativePath": "uploads/Oaks SST.PDF",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/Oaks SST.PDF"
     }
   ]
 }

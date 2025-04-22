@@ -1,10 +1,11 @@
+using System.IO;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using BillManager.Models;
 using BillManager.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace BillManager.Pages.Bills
 {
@@ -43,6 +44,47 @@ namespace BillManager.Pages.Bills
             };
 
             Bills = await bills.ToListAsync();
+        }
+
+        public async Task<IActionResult> OnPostDeleteSelectedAsync(List<int> selectedBillIds)
+        {
+            if (selectedBillIds == null || !selectedBillIds.Any())
+            {
+                ModelState.AddModelError(string.Empty, "No bills selected for deletion.");
+                Bills = await _context.Bills.Include(b => b.Biller).ToListAsync();
+                return Page();
+            }
+
+            var billsToDelete = await _context.Bills
+                .Where(b => selectedBillIds.Contains(b.Id))
+                .ToListAsync();
+
+            foreach (var bill in billsToDelete)
+            {
+                if (!string.IsNullOrEmpty(bill.FilePath) && System.IO.File.Exists(bill.FilePath))
+                {
+                    // Delete the file from the file system
+                    System.IO.File.Delete(bill.FilePath);
+                }
+            }
+
+            _context.Bills.RemoveRange(billsToDelete);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage();
+        }
+
+        public IActionResult OnGetDownload(int id)
+        {
+            var bill = _context.Bills.FirstOrDefault(b => b.Id == id);
+            if (bill == null || string.IsNullOrEmpty(bill.FilePath) || !System.IO.File.Exists(bill.FilePath))
+            {
+                return NotFound();
+            }
+
+            var fileName = Path.GetFileName(bill.FilePath);
+            var fileBytes = System.IO.File.ReadAllBytes(bill.FilePath);
+            return File(fileBytes, "application/octet-stream", fileName);
         }
     }
 }
