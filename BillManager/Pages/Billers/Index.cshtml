@@ -33,6 +33,7 @@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-outline-primary" asp-page="./Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-sm btn-outline-success" asp-page="../Bills/Create" asp-route-billerId="@item.Id">+ Add Bill</a>
                     <a class="btn btn-sm btn-outline-secondary" asp-page="./Details" asp-route-id="@item.Id">Details</a>
                     <a class="btn btn-sm btn-outline-danger" asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
                 </td>

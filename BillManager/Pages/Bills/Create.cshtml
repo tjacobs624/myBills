@@ -3,6 +3,14 @@
 
 <h2>Create Bill</h2>
 
+@if (Model.Biller != null)
+{
+    <h3>Bill for @Model.Biller.Name</h3>
+}
+else
+{
+    <h3>Bill for New Biller</h3>
+}
 <form method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label for="Name">Bill Name</label>
@@ -44,15 +52,31 @@
 
     <div class="form-group">
         <label for="Biller">Biller</label>
+    @if (Model.Biller != null)
+    {
+        // If a biller is passed in, we assume it's the one to be used, prepopulate the dropdown menu, but allow for a different one to be selected
+        <select id="Biller" name="Input.BillerId" class="form-control" required>
+            <option value="@Model.Biller.Id">@Model.Biller.Name</option>
+            @foreach (var biller in Model.Billers)
+            {
+                if (biller.Value != Model.Biller.Id.ToString())
+                {
+                    <option value="@biller.Value">@biller.Text</option>
+                }
+            }
+        </select>
+    }
+    else
+    {
         <select id="Biller" name="Input.BillerId" class="form-control" required>
             <option value="" disabled selected>Select a biller</option>
-           @foreach (var biller in Model.Billers)
-{
-    <option value="@biller.Value">@biller.Text</option>
-}
-
+            @foreach (var biller in Model.Billers)
+            {
+                <option value="@biller.Value">@biller.Text</option>
+            }
         </select>
-    </div>
+    }
+</div>
     <div class="form-group">
         <label for="File">Attach File</label>
         <input type="file" name="Input.File" class="form-control" />

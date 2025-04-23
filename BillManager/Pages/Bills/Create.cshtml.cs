@@ -26,9 +26,36 @@ namespace BillManager.Pages.Bills
 
         public List<SelectListItem> Billers { get; set; } = new();
 
+        // Property to hold the selected Biller
+        public Biller Biller { get; set; }
+
         // OnGet method to fetch the billers from the database
-        public IActionResult OnGet()
+        public IActionResult OnGet(int? billerId)
         {
+            if (billerId.HasValue){
+                Biller = _context.Billers.FirstOrDefault(b => b.Id == billerId.Value);
+                if (Biller != null)
+                {
+                    Input = new BillInput
+                    {
+                        BillerId = Biller.Id,
+                        Name = Biller.Name,
+                        DueDate = DateTime.Now.AddDays(7) // Default due date
+                    };
+                }
+                else
+                {
+                    return NotFound();
+                }
+                if (Biller == null)
+                {
+                    return NotFound();
+                }
+            }
+            
+            // Prepopulate the Biller with the selected biller
+            
+
             // Populate Billers list
             LoadBillers();
             return Page();
